@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Dealership Chatbot</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold mb-4">Car Dealership Assistant</h1>
+                <div id="chat-messages" class="space-y-4 mb-4 h-96 overflow-y-auto"></div>
+                <div class="flex space-x-2">
+                    <input 
+                        type="text" 
+                        id="user-input" 
+                        class="flex-1 p-2 border rounded"
+                        placeholder="Type your message here..."
+                    >
+                    <button 
+                        id="send-button"
+                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let conversationData = {
+            state: 'greeting',
+            user_info: {},
+            vehicles: []
+        };
+
+        async function sendMessage(message) {
+            try {
+                const response = await fetch('/api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message,
+                        conversation_data: conversationData
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Update conversation data
+                conversationData = {
+                    state: data.state,
+                    user_info: data.user_info,
+                    vehicles: data.vehicles
+                };
+
+                return data.content;
+            } catch (error) {
+                console.error('Error:', error);
+                return 'Sorry, something went wrong. Please try again.';
+            }
+        }
+
+        function addMessage(message, isUser = false) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `p-3 rounded ${isUser ? 'bg-blue-100 ml-auto' : 'bg-gray-100'} max-w-3/4`;
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        document.getElementById('send-button').addEventListener('click', async () => {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message, true);
+                input.value = '';
+                
+                const response = await sendMessage(message);
+                addMessage(response);
+            }
+        });
+
+        document.getElementById('user-input').addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                const message = e.target.value.trim();
+                
+                if (message) {
+                    addMessage(message, true);
+                    e.target.value = '';
+                    
+                    const response = await sendMessage(message);
+                    addMessage(response);
+                }
+            }
+        });
+
+        // Initial greeting
+        window.onload = async () => {
+            const response = await sendMessage('');
+            addMessage(response);
+        };
+    </script>
+</body>
+</html>

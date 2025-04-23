@@ -100,9 +100,29 @@ This project builds a fully AI-powered **Car Sales Assistant** that engages cust
 
 ## 1. Clone the Repo
 
-```bash
     git clone https://github.com/yourusername/ai-car-sales-agent.git
     cd ai-car-sales-agent
+
+
+
+# 📈 Future Enhancements
+ - Integrate with dealership inventory API for real-time car matching
+ - Enable voice interaction via Deepgram & ElevenLabs
+ - Add customer authentication and session history
+ - Analytics dashboard for sales teams
+
+   
+
+# 🤝 Contributing
+
+ - We welcome PRs, ideas, and bug reports. Check the CONTRIBUTING.md to get started.
+
+
+
+# 📜 License
+
+
+- MIT License – Use freely, but please credit the original repo and contributors.
 
 
 
